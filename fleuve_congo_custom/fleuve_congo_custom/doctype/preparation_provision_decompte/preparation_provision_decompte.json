@@ -1,0 +1,231 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-08 18:13:36.592848",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "categorie",
+  "categories",
+  "salaire",
+  "date_embauche",
+  "fin_contrat",
+  "column_break_1pcpe",
+  "transport",
+  "logement",
+  "prime",
+  "unpaid_days",
+  "jrs_prest\u00e9s_et_r\u00e9cupe",
+  "cong\u00e9_pay\u00e9s_non_pris",
+  "column_break_vypug",
+  "nuits_pret\u00e9es",
+  "jours_malade",
+  "jours_f\u00e9ri\u00e9s",
+  "jours_suspensions",
+  "allocation_sc",
+  "nbre_enfants",
+  "allocations_fam",
+  "valeur_decompte_section",
+  "anciennet\u00e9_details",
+  "anciennete",
+  "preavis_days",
+  "column_break_4zmav",
+  "conge_sur_pr\u00e9avis",
+  "conge_compensatoire",
+  "gratification13\u00e8_mois",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "salaire",
+   "fieldtype": "Float",
+   "label": "Salaire"
+  },
+  {
+   "fieldname": "date_embauche",
+   "fieldtype": "Date",
+   "label": "D\u00e9but Contrat"
+  },
+  {
+   "fieldname": "fin_contrat",
+   "fieldtype": "Date",
+   "label": "Fin Contrat"
+  },
+  {
+   "fieldname": "column_break_1pcpe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "transport",
+   "fieldtype": "Float",
+   "label": "Transport"
+  },
+  {
+   "fieldname": "logement",
+   "fieldtype": "Float",
+   "label": "Logement"
+  },
+  {
+   "fieldname": "prime",
+   "fieldtype": "Float",
+   "label": "Prime"
+  },
+  {
+   "fieldname": "unpaid_days",
+   "fieldtype": "Float",
+   "label": "Unpaid Days"
+  },
+  {
+   "fieldname": "jrs_prest\u00e9s_et_r\u00e9cupe",
+   "fieldtype": "Float",
+   "label": "Jrs Prest\u00e9s et R\u00e9cupe"
+  },
+  {
+   "fieldname": "cong\u00e9_pay\u00e9s_non_pris",
+   "fieldtype": "Float",
+   "label": "Cong\u00e9 Pay\u00e9s non pris"
+  },
+  {
+   "fieldname": "column_break_vypug",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nuits_pret\u00e9es",
+   "fieldtype": "Float",
+   "label": "Nuits pret\u00e9es"
+  },
+  {
+   "fieldname": "jours_malade",
+   "fieldtype": "Int",
+   "label": "Jours Malade"
+  },
+  {
+   "fieldname": "jours_f\u00e9ri\u00e9s",
+   "fieldtype": "Int",
+   "label": "Jours F\u00e9ri\u00e9s"
+  },
+  {
+   "fieldname": "jours_suspensions",
+   "fieldtype": "Int",
+   "label": "Jours Suspensions"
+  },
+  {
+   "fieldname": "allocation_sc",
+   "fieldtype": "Percent",
+   "label": "% Allocation SC"
+  },
+  {
+   "fieldname": "nbre_enfants",
+   "fieldtype": "Int",
+   "label": "Nbre Enfants"
+  },
+  {
+   "fieldname": "allocations_fam",
+   "fieldtype": "Float",
+   "label": "ALLOCATIONS Fam"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "valeur_decompte_section",
+   "fieldtype": "Section Break",
+   "label": "Valeur Decompte"
+  },
+  {
+   "fieldname": "anciennet\u00e9_details",
+   "fieldtype": "Data",
+   "label": "Anciennet\u00e9 Details"
+  },
+  {
+   "fieldname": "anciennete",
+   "fieldtype": "Float",
+   "label": "Anciennete"
+  },
+  {
+   "fieldname": "preavis_days",
+   "fieldtype": "Float",
+   "label": "PREAVIS Days"
+  },
+  {
+   "fieldname": "column_break_4zmav",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "conge_sur_pr\u00e9avis",
+   "fieldtype": "Float",
+   "label": "CONGE SUR Pr\u00e9avis"
+  },
+  {
+   "fieldname": "conge_compensatoire",
+   "fieldtype": "Float",
+   "label": "CONGE COMPENSATOIRE"
+  },
+  {
+   "fieldname": "gratification13\u00e8_mois",
+   "fieldtype": "Float",
+   "label": "GRATIFICATION13\u00e8 Mois"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Preparation Provision Decompte",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.employee_category_details",
+   "fieldname": "categorie",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Categorie"
+  },
+  {
+   "fetch_from": "employee.employee_category_details",
+   "fieldname": "categories",
+   "fieldtype": "Data",
+   "label": "Categories"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-07-09 18:42:00.898124",
+ "modified_by": "Administrator",
+ "module": "Fleuve Congo Custom",
+ "name": "Preparation Provision Decompte",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

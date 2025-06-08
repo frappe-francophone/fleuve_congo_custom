@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "creation": "2024-05-22 15:53:53.599917",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "annee",
+  "mois",
+  "periode_date_begin",
+  "periode_date_end",
+  "date_join",
+  "date_begin",
+  "date_end",
+  "date_quit",
+  "employee",
+  "new_rate",
+  "period_days",
+  "rate",
+  "salaire",
+  "start_period_days",
+  "years_difference",
+  "year_div_5",
+  "categorie"
+ ],
+ "fields": [
+  {
+   "fieldname": "annee",
+   "fieldtype": "Data",
+   "label": "Annee"
+  },
+  {
+   "fieldname": "mois",
+   "fieldtype": "Data",
+   "label": "Mois"
+  },
+  {
+   "fieldname": "periode_date_begin",
+   "fieldtype": "Date",
+   "label": "Periode Date Begin"
+  },
+  {
+   "fieldname": "periode_date_end",
+   "fieldtype": "Date",
+   "label": "Periode Date End"
+  },
+  {
+   "fieldname": "date_join",
+   "fieldtype": "Date",
+   "label": "Date Join"
+  },
+  {
+   "fieldname": "date_begin",
+   "fieldtype": "Date",
+   "label": "Date Begin"
+  },
+  {
+   "fieldname": "date_end",
+   "fieldtype": "Date",
+   "label": "Date End"
+  },
+  {
+   "fieldname": "date_quit",
+   "fieldtype": "Date",
+   "label": "Date Quit"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "new_rate",
+   "fieldtype": "Float",
+   "label": "New Rate"
+  },
+  {
+   "fieldname": "period_days",
+   "fieldtype": "Int",
+   "label": "Period Days"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "Rate"
+  },
+  {
+   "fieldname": "salaire",
+   "fieldtype": "Currency",
+   "label": "Salaire"
+  },
+  {
+   "fieldname": "start_period_days",
+   "fieldtype": "Int",
+   "label": "Start Period Days"
+  },
+  {
+   "fieldname": "years_difference",
+   "fieldtype": "Int",
+   "label": "Years Difference"
+  },
+  {
+   "fieldname": "year_div_5",
+   "fieldtype": "Int",
+   "label": "Year Div 5"
+  },
+  {
+   "fieldname": "categorie",
+   "fieldtype": "Link",
+   "label": "Categorie",
+   "options": "Employee Category Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-24 08:58:27.917773",
+ "modified_by": "Administrator",
+ "module": "Fleuve Congo Custom",
+ "name": "Provision Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,122 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-24 12:31:10.771455",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "report",
+  "janvier",
+  "fevrier",
+  "mars",
+  "avril",
+  "mai",
+  "juin",
+  "juillet",
+  "aout",
+  "septembre",
+  "octobre",
+  "novembre",
+  "decembre",
+  "pris",
+  "total"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Data",
+   "label": "Employee"
+  },
+  {
+   "default": "0",
+   "fieldname": "report",
+   "fieldtype": "Float",
+   "label": "Report"
+  },
+  {
+   "fieldname": "janvier",
+   "fieldtype": "Float",
+   "label": "Janvier"
+  },
+  {
+   "fieldname": "fevrier",
+   "fieldtype": "Float",
+   "label": "Fevrier"
+  },
+  {
+   "fieldname": "mars",
+   "fieldtype": "Float",
+   "label": "Mars"
+  },
+  {
+   "fieldname": "avril",
+   "fieldtype": "Float",
+   "label": "Avril"
+  },
+  {
+   "fieldname": "mai",
+   "fieldtype": "Float",
+   "label": "Mai"
+  },
+  {
+   "fieldname": "juin",
+   "fieldtype": "Float",
+   "label": "Juin"
+  },
+  {
+   "fieldname": "juillet",
+   "fieldtype": "Float",
+   "label": "Juillet"
+  },
+  {
+   "fieldname": "aout",
+   "fieldtype": "Float",
+   "label": "Aout"
+  },
+  {
+   "fieldname": "septembre",
+   "fieldtype": "Float",
+   "label": "Septembre"
+  },
+  {
+   "fieldname": "octobre",
+   "fieldtype": "Float",
+   "label": "Octobre"
+  },
+  {
+   "fieldname": "novembre",
+   "fieldtype": "Float",
+   "label": "Novembre"
+  },
+  {
+   "fieldname": "decembre",
+   "fieldtype": "Float",
+   "label": "Decembre"
+  },
+  {
+   "default": "0",
+   "fieldname": "pris",
+   "fieldtype": "Float",
+   "label": "Pris"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "label": "Total"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-24 12:48:46.904261",
+ "modified_by": "Administrator",
+ "module": "Fleuve Congo Custom",
+ "name": "Provision Ratio",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

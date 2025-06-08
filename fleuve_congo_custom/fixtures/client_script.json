@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee",
+  "enabled": 1,
+  "modified": "2024-05-27 23:23:53.343454",
+  "module": "Fleuve Congo Custom",
+  "name": "Update Employee Provision",
+  "script": "frappe.ui.form.on('Employee', {\n\trefresh(frm) {\n\t\tfrm.add_custom_button(\n\t\t\t__(\"Provision\"),\n\t\t\tfunction () {\n\t\t\t\tif(frm.is_new()) return;\n\t\t\t\tlet d = new frappe.ui.Dialog({\n\t\t\t\t\ttitle: 'Mise \u00e0 jour Provision',\n\t\t\t\t\tfields: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tlabel: 'Fiscal Year',\n\t\t\t\t\t\t\tfieldname: 'fiscal_year',\n\t\t\t\t\t\t\tfieldtype: 'Link',\n\t\t\t\t\t\t\toptions: \"Fiscal Year\",\n\t\t\t\t\t\t\ton_change : () => {\n\t\t\t\t\t\t\t    frappe.db.get_doc(\"Fiscal Year\", cur_dialog.get_value('fiscal_year')).then(r => {\n    \t\t\t\t\t\t    cur_dialog.set_value('debut',r.start_date);\n    \t\t\t\t\t\t    cur_dialog.set_value('fin',r.end_date);\n    \t\t\t\t\t\t});\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t],\n\t\t\t\t\tprimary_action_label: __('Mettre \u00e0 jour'),\n\t\t\t\t\tprimary_action(values) {\n\t\t\t\t\t    \n\t\t\t\t\t    frappe.call({\n            \t\t\tmethod: \"fleuve_congo_custom.fleuve_congo_custom.doctype.provision.provision.update_provision_details\",\n            \t\t\targs: {\n            \t\t\t\tfiscal_year: values.fiscal_year,\n            \t\t\t\temp_name: frm.doc.name,\n            \t\t\t},\n            \t\t\tcallback: function (r) {\n            \t\t\t\tif (r) {\n                                frappe.msgprint(\"Provision Mise \u00e0 Jour\");\n                            }\n            \t\t\t}\n            \t\t});\n\t\t\t\t\t\t\n\t\t\t\t\t\td.hide();\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\td.show();\n\t\t\t}\n\t\t);\n\t}\n})",
+  "view": "Form"
+ }
+]

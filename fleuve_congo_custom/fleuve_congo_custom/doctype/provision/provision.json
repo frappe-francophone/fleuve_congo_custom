@@ -1,0 +1,199 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{YY}PROV{###}",
+ "creation": "2024-05-22 15:38:05.166227",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "fiscal_year",
+  "column_break_oyelb",
+  "scondary_calendar",
+  "section_break_xblxy",
+  "start_date",
+  "employment_type",
+  "first_start",
+  "second_start",
+  "column_break_hiksf",
+  "end_date",
+  "leave_type",
+  "first_end",
+  "second_end",
+  "section_break_j868h",
+  "ratio",
+  "tab_break_wrmci",
+  "conge",
+  "tab_break_wavtr",
+  "gratification",
+  "tab_break_ki6qa",
+  "ticket",
+  "tab_break_yeabz",
+  "bonus",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "column_break_hiksf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "section_break_j868h",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ratio",
+   "fieldtype": "Table",
+   "label": "Ratio",
+   "options": "Provision Ratio"
+  },
+  {
+   "fieldname": "conge",
+   "fieldtype": "Table",
+   "options": "Provision Conge"
+  },
+  {
+   "fieldname": "gratification",
+   "fieldtype": "Table",
+   "options": "Provision Gratification"
+  },
+  {
+   "fieldname": "tab_break_wrmci",
+   "fieldtype": "Tab Break",
+   "label": "Conge"
+  },
+  {
+   "fieldname": "tab_break_wavtr",
+   "fieldtype": "Tab Break",
+   "label": "Gratification"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Provision",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
+  },
+  {
+   "fieldname": "leave_type",
+   "fieldtype": "Link",
+   "label": "Leave Type",
+   "options": "Leave Type"
+  },
+  {
+   "fieldname": "section_break_xblxy",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "column_break_oyelb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "scondary_calendar",
+   "fieldtype": "Check",
+   "label": "Scondary Calendar"
+  },
+  {
+   "fetch_from": "fiscal_year.year_start_date",
+   "fieldname": "first_start",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "First Start"
+  },
+  {
+   "fetch_from": "fiscal_year.second_year_start_date",
+   "fieldname": "second_start",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Second Start"
+  },
+  {
+   "fetch_from": "fiscal_year.year_end_date",
+   "fieldname": "first_end",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "First End"
+  },
+  {
+   "fetch_from": "fiscal_year.second_year_end_date",
+   "fieldname": "second_end",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Second End"
+  },
+  {
+   "fieldname": "tab_break_ki6qa",
+   "fieldtype": "Tab Break",
+   "label": "Ticket"
+  },
+  {
+   "fieldname": "ticket",
+   "fieldtype": "Table",
+   "options": "Provision Ticket"
+  },
+  {
+   "fieldname": "tab_break_yeabz",
+   "fieldtype": "Tab Break",
+   "label": "Bonus"
+  },
+  {
+   "fieldname": "bonus",
+   "fieldtype": "Table",
+   "options": "Provision Bonus"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-06-09 19:04:59.035847",
+ "modified_by": "Administrator",
+ "module": "Fleuve Congo Custom",
+ "name": "Provision",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
