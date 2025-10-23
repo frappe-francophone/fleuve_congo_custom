@@ -3,6 +3,9 @@ import json
 import requests
 from datetime import datetime
 import pytz
+from frappe.utils import now
+import string
+import random
 
 def cron():
     url_base = "http://10.184.104.230:8080/iclock/api/transactions/"
@@ -17,7 +20,7 @@ def cron():
     # Use correct date format
     #datejour_end = '2024-11-30'
 
-    datejour_start = frappe.utils.add_days(date_time_string, -25)
+    datejour_start = frappe.utils.add_days(date_time_string, -35)
     date_end = frappe.utils.add_days(date_time_string, 2)
   
     datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -43,7 +46,7 @@ def cron():
             # Get today's date
         date_time_string = frappe.utils.now()
 
-        datejour_start = frappe.utils.add_days(date_time_string, -25)
+        datejour_start = frappe.utils.add_days(date_time_string, -35)
         date_end = frappe.utils.add_days(date_time_string, 2)
     
         datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -149,6 +152,8 @@ def cron():
                         attendance_list.insert(ignore_permissions=True)
                         frappe.db.commit()
 
+                        every_minute(list.Matricule)
+
                         message = f"Employee Code: {emp_code}, Name: {first_name} , Devices {terminal_sn}, Punch Time: {punch_time}"
                         print(message)  
                 
@@ -160,5 +165,23 @@ def cron():
         except Exception as e:
             frappe.throw(f"Une erreur inattendue s'est produite : {str(e)}")
 
-def hourly() :
-    print('thanks')
+def every_minute(name):
+    current_time = now()
+    frappe.logger().info(f"[every_minute] Tâche exécutée à {current_time}")
+    
+    # Générer une chaîne aléatoire de 20 caractères
+    letters = string.ascii_letters
+    random_text = "".join(random.choice(letters) for i in range(20))
+    
+    # Concaténation simple
+    note_title = f"{name} {random_text}"
+    
+    # Création du document Note
+    new_note = frappe.get_doc({
+        "doctype": "Note",
+        "title": note_title
+    })
+    new_note.insert()
+    frappe.db.commit()
+    
+    print(f"[every_minute] Tâche exécutée à {current_time}")

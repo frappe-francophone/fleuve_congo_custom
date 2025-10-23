@@ -301,159 +301,104 @@ class Provision(Document):
 			{"fiscal_year":int(year), "employee": employee}, as_dict=1
 		)
 
-
 	def get_provision_details(self, emp_name = None):
 		employee_name = emp_name if emp_name else "%"
+		frappe.msgprint(f"ℹ️ Données déjà présentes trouvé {self.scondary_calendar}, année {self.fiscal_year}")
 		return self.second_calandar_query(employee_name) if self.scondary_calendar == 1 else self.first_calandar_query(employee_name)
 
 	@frappe.whitelist()
 	def add_details(self):
+		# 🔹 Nettoyer les anciennes lignes
 		self.ratio.clear()
 		self.conge.clear()
 		self.gratification.clear()
+		self.ticket.clear()
+		self.bonus.clear()
 
+		# 🔹 Récupérer la liste des provisions de base (par employé)
 		liste = self.get_provision_details()
+		if not liste:
+			print("⚠️ Aucun détail de provision trouvé.")
+			return
 
+		# 🔹 Liste des mois (01 → janvier, etc.)
+		mois_labels = [
+			"janvier", "fevrier", "mars", "avril", "mai", "juin",
+			"juillet", "aout", "septembre", "octobre", "novembre", "decembre"
+		]
+
+		# 🔹 Mapping provision → (nom de la table, préfix des champs source, champ cible dans self, has_report)
+		mapping = {
+			"ratio":        ("`tabProvision Ratio`", "ratio", "ratio", True),
+			"conge":        ("`tabProvision Conge`", "salmois", "conge", True),
+			"gratification":("`tabProvision Gratification`", "gratif", "gratification", False),
+			"ticket":       ("`tabProvision Ticket`", "air_ticket", "ticket", False),
+			"bonus":        ("`tabProvision Bonus`", "bonus", "bonus", False),
+		}
+
+		# 🔹 Parcourir chaque employé
 		for i in liste:
-			exist = self.get_provision_ratio(i.employee, '`tabProvision Ratio`', int(self.fiscal_year))
-			if not exist:
-				ly_total_ratio = 0
-				ly_total_conge = 0
-				ly_total_gratif = 0
-				ly_total_ticket = 0
-				ly_total_bonus = 0
+			if not i.employee:
+				print("⚠️ Ligne ignorée : employé manquant.")
+				continue
 
-				details = self.get_provision_ratio(i.employee, '`tabProvision Ratio`', int(self.fiscal_year) - 1)
-				if details:
-					if details[0]:
-						ly_total_ratio = details[0].total if details[0].total else 0
+			# Vérifier si des données existent déjà pour l'année courante
+			exist = self.get_provision_ratio(i.employee, "`tabProvision Ratio`", int(self.fiscal_year))
+			if exist:
+				print(f"ℹ️ Données déjà présentes pour {i.employee}, année {self.fiscal_year}")
+				continue
 
-				details = self.get_provision_ratio(i.employee, '`tabProvision Conge`', int(self.fiscal_year) - 1)
-				if details:
-					if details[0]:
-						ly_total_conge = details[0].total if details[0].total else 0
+			# 🔹 Récupérer les reports (totaux de l'année précédente uniquement pour ratio et conge)
+			last_year = int(self.fiscal_year) - 1
+			reports = {}
+			for key, (table, _, _, has_report) in mapping.items():
+				if has_report:
+					details = self.get_provision_ratio(i.employee, table, last_year)
+					reports[key] = details[0].total if details and details[0] and details[0].total else 0
+				else:
+					reports[key] = 0  # pas de report
 
-				details = self.get_provision_ratio(i.employee, '`tabProvision Gratification`', int(self.fiscal_year) - 1)
-				if details:
-					if details[0]:
-						ly_total_gratif = details[0].total if details[0].total else 0
+			# 🔹 Création des lignes par type de provision
+			for key, (table, prefix, target, has_report) in mapping.items():
 
-				details = self.get_provision_ratio(i.employee, '`tabProvision Ticket`', int(self.fiscal_year) - 1)
-				if details:
-					if details[0]:
-						ly_total_ticket = details[0].total if details[0].total else 0
+				# Cas particuliers : on saute "ticket" ou "bonus" si pas de données
+				if key == "ticket" and not getattr(i, "air_ticket01", None):
+					continue
+				if key == "bonus" and not getattr(i, "bonus01", None):
+					continue
 
-				details = self.get_provision_ratio(i.employee, '`tabProvision Bonus`', int(self.fiscal_year) - 1)
-				if details:
-					if details[0]:
-						ly_total_bonus = details[0].total if details[0].total else 0
+				# Base des valeurs à insérer dans la table
+				values = {
+					"employee": i.employee,
+				}
+				if has_report:
+					values["report"] = reports[key]
 
-				self.append(
-						"ratio",
-						{
-							"employee": i.employee,
-							"report": ly_total_ratio,
-							"janvier": i.ratio01,
-							"fevrier": i.ratio02,
-							"mars": i.ratio03,
-							"avril": i.ratio04,
-							"mai": i.ratio05,
-							"juin": i.ratio06,
-							"juillet": i.ratio07,
-							"aout": i.ratio08,
-							"septembre": i.ratio09,
-							"octobre": i.ratio10,
-							"novembre": i.ratio11,
-							"decembre": i.ratio12,
-							"total": i.ratio_total + ly_total_ratio,
-						}
-					)
+				total = reports[key] if has_report else 0
+				somme_mensuelle = 0  # 🔹 compteur des mois > 0
 
-				self.append(
-						"conge",
-						{
-							"employee": i.employee,
-							"report": ly_total_conge,
-							"janvier": i.salmois01,
-							"fevrier": i.salmois02,
-							"mars": i.salmois03,
-							"avril": i.salmois04,
-							"mai": i.salmois05,
-							"juin": i.salmois06,
-							"juillet": i.salmois07,
-							"aout": i.salmois08,
-							"septembre": i.salmois09,
-							"octobre": i.salmois10,
-							"novembre": i.salmois11,
-							"decembre": i.salmois12,
-							"total": ly_total_conge + i.salmois01 + i.salmois02 + i.salmois03 + i.salmois04 + i.salmois05 + i.salmois06 + i.salmois07 + i.salmois08 + i.salmois09 + i.salmois10 + i.salmois11 + i.salmois12
-						}
-					)
+				# 🔹 Boucler sur chaque mois et affecter les valeurs
+				for idx, mois in enumerate(mois_labels, start=1):
+					field = f"{prefix}{str(idx).zfill(2)}"  # ex: ratio01, gratif05, etc.
+					val = getattr(i, field, 0) or 0
+					values[mois] = val
+					total += val
+					somme_mensuelle += val
 
-				self.append(
-						"gratification",
-						{
-							"employee": i.employee,
-							"report": ly_total_gratif,
-							"janvier": i.gratif01,
-							"fevrier": i.gratif02,
-							"mars": i.gratif03,
-							"avril": i.gratif04,
-							"mai": i.gratif05,
-							"juin": i.gratif06,
-							"juillet": i.gratif07,
-							"aout": i.gratif08,
-							"septembre": i.gratif09,
-							"octobre": i.gratif10,
-							"novembre": i.gratif11,
-							"decembre": i.gratif12,
-							"total": ly_total_gratif + i.gratif01 + i.gratif02 + i.gratif03 + i.gratif04 + i.gratif05 + i.gratif06 + i.gratif07 + i.gratif08 + i.gratif09 + i.gratif10 + i.gratif11 + i.gratif12 
-						}
-					)
+				# 🔹 Ne pas ajouter si tous les mois sont à zéro
+				if somme_mensuelle == 0:
+					print(f"⏩ Ligne ignorée : {key} pour {i.employee} (aucune valeur mensuelle > 0)")
+					continue
 
-				if i.bonus01:
-					self.append(
-						"ticket",
-						{
-							"employee": i.employee,
-							"report": ly_total_ticket,
-							"janvier": i.air_ticket01,
-							"fevrier": i.air_ticket02,
-							"mars": i.air_ticket03,
-							"avril": i.air_ticket04,
-							"mai": i.air_ticket05,
-							"juin": i.air_ticket06,
-							"juillet": i.air_ticket07,
-							"aout": i.air_ticket08,
-							"septembre": i.air_ticket09,
-							"octobre": i.air_ticket10,
-							"novembre": i.air_ticket11,
-							"decembre": i.air_ticket12,
-							"total": ly_total_ticket + i.air_ticket01 + i.air_ticket02 + i.air_ticket03 + i.air_ticket04 + i.air_ticket05 + i.air_ticket06 + i.air_ticket07 + i.air_ticket08 + i.air_ticket09 + i.air_ticket10 + i.air_ticket11 + i.air_ticket12 
-						}
-					)
+				# 🔹 Calculer le total final
+				values["total"] = total
 
-					self.append(
-						"bonus",
-						{
-							"employee": i.employee,
-							"report": ly_total_bonus,
-							"janvier": i.bonus01,
-							"fevrier": i.bonus02,
-							"mars": i.bonus03,
-							"avril": i.bonus04,
-							"mai": i.bonus05,
-							"juin": i.bonus06,
-							"juillet": i.bonus07,
-							"aout": i.bonus08,
-							"septembre": i.bonus09,
-							"octobre": i.bonus10,
-							"novembre": i.bonus11,
-							"decembre": i.bonus12,
-							"total": ly_total_bonus + i.bonus01 + i.bonus02 + i.bonus03 + i.bonus04 + i.bonus05 + i.bonus06 + i.bonus07 + i.bonus08 + i.bonus09 + i.bonus10 + i.bonus11 + i.bonus12 
-						}
-					)
+				# 🔹 Ajouter dans la table correspondante de self
+				self.append(target, values)
 
+				print(f"✅ Ajout de {key} pour {i.employee} (total: {total})")
+
+		
 	def before_save(self):
 		self.add_details()
 
@@ -462,147 +407,96 @@ class Provision(Document):
 			doc = frappe.new_doc("Leave Allocation")
 			doc.leave_type = self.leave_type
 			doc.employee = i.employee
+			doc.provision = self.name
 			doc.new_leaves_allocated = i.total
 			doc.from_date = self.start_date
 			doc.to_date = self.end_date
 			doc.submit()
 
 @frappe.whitelist()
-def update_provision_details(fiscal_year, emp_name):
-	liste = frappe.db.get_list("Provision", {"fiscal_year": int(fiscal_year)}, ["*"])
-	for i in liste:
-		ratio_list =frappe.db.sql(
-				"""
-				SELECT * 
-				FROM `tabProvision Ratio`
-				WHERE employee = %s AND parent = %s
-				""", (emp_name, i.name), as_dict=1
-			)
-		if len(ratio_list) > 0 :
-			doc = frappe.get_doc("Provision", i.name)
-			details = doc.get_provision_details(emp_name)
-			if details[0]:
-				d  = details[0]
-				#ratio_doc = frappe.get_doc("Provision Ratio", {"employee": emp_name, "parent": doc.name})
-				frappe.db.set_value('Provision Ratio', ratio_list[0].name, 	{
-					"janvier": d.ratio01,
-					"fevrier": d.ratio02,
-					"mars": d.ratio03,
-					"avril": d.ratio04,
-					"mai": d.ratio05,
-					"juin": d.ratio06,
-					"juillet": d.ratio07,
-					"aout": d.ratio08,
-					"septembre": d.ratio09,
-					"octobre": d.ratio10,
-					"novembre": d.ratio11,
-					"decembre": d.ratio12,
-					"total": ratio_list[0].report + d.ratio01 + d.ratio02 + d.ratio03 + d.ratio04 + d.ratio05 + d.ratio06 + 
-					d.ratio07 + d.ratio08 + d.ratio09 + d.ratio10 + d.ratio11 + d.ratio12 - ratio_list[0].pris,
-				})
+def update_provision_details(fiscal_year, leave_type, emp_name, employment_type):
+    provisions = frappe.db.get_list("Provision", {"fiscal_year": int(fiscal_year)}, ["name"])
 
-				conge_list =frappe.db.sql(
-					"""
-					SELECT * 
-					FROM `tabProvision Conge`
-					WHERE employee = %s AND parent = %s
-					""", (emp_name, i.name), as_dict=1
-				)
-				#conge_doc = frappe.get_doc("Provision Conge", {"employee": emp_name, "parent": doc.name})
-				frappe.db.set_value('Provision Conge', conge_list[0].name, 	{
-					"janvier": d.salmois01,
-					"fevrier": d.salmois02,
-					"mars": d.salmois03,
-					"avril": d.salmois04,
-					"mai": d.salmois05,
-					"juin": d.salmois06,
-					"juillet": d.salmois07,
-					"aout": d.salmois08,
-					"septembre": d.salmois09,
-					"octobre": d.salmois10,
-					"novembre": d.salmois11,
-					"decembre": d.salmois12,
-					"total": conge_list[0].report + d.salmois01 + d.salmois02 + d.salmois03 + d.salmois04 + d.salmois05 + d.salmois06 + 
-					d.salmois07 + d.salmois08 + d.salmois09 + d.salmois10 + d.salmois11 + d.salmois12 - conge_list[0].pris,
-				})
+    if not provisions:
+        frappe.throw("Aucune provision trouvée pour cet exercice.")
 
-				gratif_list =frappe.db.sql(
-					"""
-					SELECT * 
-					FROM `tabProvision Gratification`
-					WHERE employee = %s AND parent = %s
-					""", (emp_name, i.name), as_dict=1
-				)
-				#gratif_doc = frappe.get_doc("Provision Gratification", {"employee": emp_name, "parent": doc.name})
-				frappe.db.set_value('Provision Gratification', gratif_list[0].name, 	{
-					"janvier": d.gratif01,
-					"fevrier": d.gratif02,
-					"mars": d.gratif03,
-					"avril": d.gratif04,
-					"mai": d.gratif05,
-					"juin": d.gratif06,
-					"juillet": d.gratif07,
-					"aout": d.gratif08,
-					"septembre": d.gratif09,
-					"octobre": d.gratif10,
-					"novembre": d.gratif11,
-					"decembre": d.gratif12,
-					"total": gratif_list[0].report + d.gratif01 + d.gratif02 + d.gratif03 + d.gratif04 + d.gratif05 + d.gratif06 + 
-					d.gratif07 + d.gratif08 + d.gratif09 + d.gratif10 + d.gratif11 + d.gratif12 - gratif_list[0].pris,
-				})
+    for prov in provisions:
+        doc = frappe.get_doc("Provision", prov.name)
+        details = doc.get_provision_details(emp_name)
 
-				if d.bonus01:
-					#frappe.db.set_value('Provision Ticket', gratif_list[0].name, 	{
-					#		"employee": d.employee,
-					#		"report": gratif_list[0].report,
-					#		"janvier": d.air_ticket01,
-					#		"fevrier": d.air_ticket02,
-					#		"mars": d.air_ticket03,
-					#		"avril": d.air_ticket04,
-					#		"mai": d.air_ticket05,
-					#		"juin": d.air_ticket06,
-					#		"juillet": d.air_ticket07,
-					#		"aout": d.air_ticket08,
-					#		"septembre": d.air_ticket09,
-					#		"octobre": d.air_ticket10,
-					#		"novembre": d.air_ticket11,
-					#		"decembre": d.air_ticket12,
-					#		"total": gratif_list[0].report + d.air_ticket01 + d.air_ticket02 + d.air_ticket03 + d.air_ticket04 + d.air_ticket05 + 
-					#		d.air_ticket06 + d.air_ticket07 + d.air_ticket08 + d.air_ticket09 + d.air_ticket10 + d.air_ticket11 + d.air_ticket12 
-					#	}
-					#)
+        if not details:
+            continue  # aucun détail pour cet employé
+        d = details[0]
 
-					gratif_list =frappe.db.sql(
-						"""
-						SELECT * 
-						FROM `tabProvision Ticket`
-						WHERE employee = %s AND parent = %s
-						""", (emp_name, i.name), as_dict=1
-					)
+        # Définir les mappings entre table et champs
+        tables = {
+            "Provision Ratio": {
+                "prefix": "ratio",
+                "fields": [f"ratio{str(i).zfill(2)}" for i in range(1, 13)]
+            },
+            "Provision Conge": {
+                "prefix": "salmois",
+                "fields": [f"salmois{str(i).zfill(2)}" for i in range(1, 13)]
+            },
+            "Provision Gratification": {
+                "prefix": "gratif",
+                "fields": [f"gratif{str(i).zfill(2)}" for i in range(1, 13)]
+            },
+        }
 
-					frappe.db.set_value('Provision Ticket', gratif_list[0].name, 	{
-							"employee": d.employee,
-							"report": gratif_list[0].report,
-							"janvier": d.bonus01,
-							"fevrier": d.bonus02,
-							"mars": d.bonus03,
-							"avril": d.bonus04,
-							"mai": d.bonus05,
-							"juin": d.bonus06,
-							"juillet": d.bonus07,
-							"aout": d.bonus08,
-							"septembre": d.bonus09,
-							"octobre": d.bonus10,
-							"novembre": d.bonus11,
-							"decembre": d.bonus12,
-							"total": gratif_list[0].report + d.bonus01 + d.bonus02 + d.bonus03 + d.bonus04 + d.bonus05 + d.bonus06 + 
-							d.bonus07 + d.bonus08 + d.bonus09 + d.bonus10 + d.bonus11 + d.bonus12 
-						}
-					)
+        # Ajouter Ticket et Bonus seulement si disponibles
+        if hasattr(d, "bonus01") and d.bonus01:
+            tables["Provision Ticket"] = {
+                "prefix": "air_ticket",
+                "fields": [f"air_ticket{str(i).zfill(2)}" for i in range(1, 13)]
+            }
+            tables["Provision Bonus"] = {
+                "prefix": "bonus",
+                "fields": [f"bonus{str(i).zfill(2)}" for i in range(1, 13)]
+            }
 
-				frappe.db.commit()
+        # Boucle générique pour mettre à jour toutes les tables
+        for table, conf in tables.items():
+            rec = frappe.db.sql(
+                f"SELECT * FROM `tab{table}` WHERE employee=%s AND parent=%s",
+                (emp_name, doc.name),
+                as_dict=1
+            )
+            if not rec:
+                continue  # rien à mettre à jour
 
-				return emp_name
+            rec = rec[0]
+            values = {}
+            somme_mensuelle = 0
+
+            for idx, field in enumerate(conf["fields"], start=1):
+                mois = [
+                    "janvier","fevrier","mars","avril","mai","juin",
+                    "juillet","aout","septembre","octobre","novembre","decembre"
+                ][idx-1]
+                val = getattr(d, field, 0) or 0
+                values[mois] = val
+                somme_mensuelle += val
+
+            # calcul total = report + somme des mois - pris
+            values["total"] = (rec.report or 0) + somme_mensuelle - (rec.pris or 0)
+
+            frappe.db.set_value(f"{table}", rec.name, values)
+
+			# Correction: Trouver le document Leave Allocation et le mettre à jour
+            leave_allocation = frappe.db.get_value(
+                "Leave Allocation",
+                {"provision": prov.name, "employee": emp_name},
+                "name"
+            )
+            
+            if leave_allocation:
+                frappe.db.set_value(
+                    "Leave Allocation",
+                    leave_allocation,
+                    "new_leaves_allocated",
+                    values["total"]
+                )
 	
 @frappe.whitelist()		
 def update_attendance_all():
@@ -619,7 +513,7 @@ def update_attendance_all():
     # Use correct date format
     #datejour_end = '2024-11-30'
 
-	datejour_start = frappe.utils.add_days(date_time_string, -25)
+	datejour_start = frappe.utils.add_days(date_time_string, -10)
 	date_end = frappe.utils.add_days(date_time_string, 2)
   
 	datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -645,7 +539,7 @@ def update_attendance_all():
             # Get today's date
 		date_time_string = frappe.utils.now()
 
-		datejour_start = frappe.utils.add_days(date_time_string, -25)
+		datejour_start = frappe.utils.add_days(date_time_string, -10)
 		date_end = frappe.utils.add_days(date_time_string, 2)
     
 		datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -778,7 +672,7 @@ def update_attendance_individuel(employee):
     # Use correct date format
     #datejour_end = '2024-11-30'
 
-	datejour_start = frappe.utils.add_days(date_time_string, -25)
+	datejour_start = frappe.utils.add_days(date_time_string, -30)
 	date_end = frappe.utils.add_days(date_time_string, 2)
   
 	datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -804,7 +698,7 @@ def update_attendance_individuel(employee):
             # Get today's date
 		date_time_string = frappe.utils.now()
 
-		datejour_start = frappe.utils.add_days(date_time_string, -25)
+		datejour_start = frappe.utils.add_days(date_time_string, -30)
 		date_end = frappe.utils.add_days(date_time_string, 2)
     
 		datejour_end = frappe.utils.formatdate(date_end, 'yyyy-mm-dd')
@@ -860,7 +754,7 @@ def update_attendance_individuel(employee):
 
 				type_jour = ''
 				emp_code = ligne.get('emp_code', 'N/A')
-				punch_time = ligne.get('punch_time', 'N/A')
+				punch_time = ligne.get('punch_time')
 				first_name = ligne.get('first_name', 'N/A')
 				terminal_sn = ligne.get('terminal_sn', 'N/A')
 
@@ -868,7 +762,7 @@ def update_attendance_individuel(employee):
                 
 				datejour_end_comp = frappe.utils.formatdate(list.date_of_joining, 'yyyy-mm-dd')
 				datejour_start = frappe.utils.formatdate(punch_time, 'yyyy-mm-dd')
-                                
+				# frappe.msgprint(f"JOINNNING DATE ################# : {datejour_end_comp} et {datejour_start}")
 				if datejour_end_comp > datejour_start :
 					print(f"JOINNNING DATE ################# : {datejour_end_comp}")
 				else :

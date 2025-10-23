@@ -130,6 +130,18 @@ override_doctype_class = {
 #	],
 # }
 
+# Scheduled Tasks
+# ---------------
+
+scheduler_events = {
+	"hourly": [
+		"fleuve_congo_custom.tasks.cron",
+        "fleuve_congo_custom.tasks.every_minute"
+	],
+}
+
+
+
 # Testing
 # -------
 
